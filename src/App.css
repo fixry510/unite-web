@@ -1,4 +1,8 @@
-.App {
+*{
+  font-family: 'Kanit', sans-serif;
+  box-sizing: border-box;
+}
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +39,12 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
+
+/* .input {
+  width: 100%;
+  background-color: #fcfcfc;
+  border: 0;
+  border-bottom: 2px solid lightgrey;
+  padding: 10px;
+} */
