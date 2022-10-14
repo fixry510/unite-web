@@ -2,7 +2,6 @@ import { toast } from 'react-toastify';
 
 const showToast = ({ text, mili = 2000, type = 'success' }) => {
     if (type == 'success') {
-
         toast.success(text, {
             position: "bottom-right",
             autoClose: 2000,

@@ -10,6 +10,7 @@ import CustomLoad from './util/CustomLoad';
 import Report from './components/Report/Report';
 import Member from './components/Member/Member';
 import AllRoom from './components/AllRoom/AllRoom';
+import AddAdmin from './components/AddAdmin/AddAdmin';
 
 function App() {
 
@@ -25,6 +26,9 @@ function App() {
               <Route index element={<Report />} />
               <Route path='/home/member' element={<Member />} />
               <Route path='/home/all-room' element={<AllRoom />} />
+              {
+                currentUser.status === 1 && <Route path='/home/add-admin' element={<AddAdmin />} />
+              }
             </Route>
         }
         <Route path='*' element={<Navigate to={!currentUser ? "/login" : "/home"} replace />} />

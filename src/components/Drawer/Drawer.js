@@ -3,7 +3,9 @@ import { useAuth } from '../../Context/AuthProvider';
 import logo from "../../images/logo.png";
 import { TbMessageReport } from "react-icons/tb";
 import { BsFillPeopleFill } from "react-icons/bs";
+import { HiUserAdd } from "react-icons/hi";
 import { MdOutlineSocialDistance } from "react-icons/md";
+import { SiGoogleclassroom } from "react-icons/si";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { NavLink } from 'react-router-dom';
@@ -27,7 +29,11 @@ const Drawer = () => {
                 <hr className='mx-5 my-2' />
                 <DrawerItem to={"/home/member"} text="สมาชิก" icon={<BsFillPeopleFill size={25} className='mr-7 text-gray-100 ' />} />
                 <hr className='mx-5 my-2' />
-                <DrawerItem to={"/home/all-room"} text="ห้องทั้งหมด" icon={<MdOutlineSocialDistance size={30} className='mr-7 text-gray-100 ' />} />
+                <DrawerItem to={"/home/all-room"} text="ห้องทั้งหมด" icon={<SiGoogleclassroom size={25} className='mr-7 text-gray-100 ' />} />
+                {currentUser.status === 1 && <React.Fragment>
+                    <hr className='mx-5 my-2' />
+                    <DrawerItem to={"/home/add-admin"} text="เพิ่มแอดมิน" icon={<HiUserAdd size={30} className='mr-7 text-gray-100 ' />} />
+                </React.Fragment>}
                 <div className='mx-5 my-10 flex flex-1 items-end'>
                     <div className='cursor-pointer flex w-full' onClick={onLogout}>
                         <div className='w-50px'>
@@ -46,6 +52,9 @@ const Drawer = () => {
                 <NavLink to={"/home"} className=' font-sm  text-gray-100 mx-[2%] cursor-pointer'> <p >รายงาน</p></NavLink>
                 <NavLink to={"/home/member"} className=' font-sm  text-gray-100 mx-[2%] cursor-pointer'><p >สมาชิก</p></NavLink>
                 <NavLink to={"/home/all-room"} className=' font-sm  text-gray-100 mx-[2%] cursor-pointer'><p>ห้องทั้งหมด</p></NavLink>
+                {
+                    currentUser.status === 1 && <NavLink to={"/home/add-admin"} className=' font-sm  text-gray-100 mx-[2%] cursor-pointer'><p>เพิ่มแอดมิน</p></NavLink>
+                }
                 <div className='w-[50px] flex justify-center items-center ml-10 cursor-pointer' onClick={onLogout}>
                     <FiLogOut size={25} className='mr-7 text-gray-100 ' />
                 </div>

@@ -10,17 +10,8 @@ const Login = () => {
 
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
-    const dispatch = useDispatch()
-
-    console.log("BUID")
 
     const { onLogin } = useAuth();
-
-    const onSubmit = async () => {
-        dispatch(showLoad());
-        const data = await onLogin(email, password);
-        dispatch(closeLoad());
-    }
 
 
     return (
@@ -46,7 +37,7 @@ const Login = () => {
                     <MdPassword size={20} className='text-gray-400 focus:text-[#796fc1]  absolute top-[35%] translate-y-[-50%] left-[12px]' />
                 </div>
                 <div className='flex flex-col w-full items-center justify-center flex-1'>
-                    <button onClick={() => onSubmit()} className="w-[85%] py-[5px] rounded-full mt-[20px]
+                    <button onClick={() => onLogin(email,password)} className="w-[85%] py-[5px] rounded-full mt-[20px]
                       font-medium text-[#796fc1] border-[2px]  bg-transparent border-[#796fc1] hover:bg-[#796fc1] hover:text-white
                      ">
                         Login
