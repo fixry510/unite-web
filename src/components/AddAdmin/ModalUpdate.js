@@ -5,9 +5,11 @@ import showToast from '../../util/showToast';
 import { showLoad, closeLoad } from '../../store/loadSlice';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
-import apiUrl from '../../config/api-url';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { db, storage } from '../../firebase';
+import { onSnapshot, doc, collection, updateDoc } from "firebase/firestore";
 
-const ModalAdd = ({ setIsAddAdmin }) => {
+const ModalUpdadte = ({ adminData, onCloseUpdate }) => {
 
     const dispatch = useDispatch();
 
@@ -16,31 +18,48 @@ const ModalAdd = ({ setIsAddAdmin }) => {
         fullName: '',
         phone: '',
         email: '',
-        password: '',
         img: '',
         file: '',
+        uid: '',
     });
+
+    useEffect(() => {
+        setNewAdminData({
+            fullName: adminData.fullName,
+            phone: adminData.phone,
+            email: adminData.email,
+            img: adminData.profile,
+            file: '',
+            uid: adminData.uid,
+        });
+    }, [])
 
 
     const onSubmit = async () => {
-        const { fullName, phone, email, password, img,file } = newAdminData;
-        if (!fullName || !phone || !email || !password || !img) {
-            return showToast({ text: 'กรุณากรอกข้อมูลให้ครบ', type: 'failed' })
-        }
+        const { fullName, phone, email, img, file, uid } = newAdminData;
+
         try {
             dispatch(showLoad());
-            const formData = new FormData()
-            formData.append('image', file)
-            formData.append('email', email);
-            formData.append('password', password);
-            formData.append('fullName', fullName);
-            formData.append('phone', phone);
-            await axios.post( apiUrl + '/auth/create-admin', formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                },
-            });
-            showToast({ text: 'สร้าง Admin สำเร็จ', type: 'success' })
+            let url = img;
+            if (file) {
+                const storageRef = ref(storage, `admin/${uid}/profile-${Date.now()}`);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+                url = await new Promise((resolve, reject) => {
+                    uploadTask.on(
+                        "state_changed",
+                        undefined,
+                        (err) => reject(''),
+                        async () => resolve((await getDownloadURL(uploadTask.snapshot.ref)))
+                    );
+                })
+            }
+            await updateDoc(doc(db, `admin/${uid}`), {
+                email,
+                fullName,
+                phone,
+                profile: url,
+            })
+            showToast({ text: 'อัปเดต Admin สำเร็จ', type: 'success' })
         } catch (e) {
             console.log(e);
             showToast({
@@ -50,7 +69,7 @@ const ModalAdd = ({ setIsAddAdmin }) => {
         } finally {
             setTimeout(() => {
                 dispatch(closeLoad());
-                setIsAddAdmin(false);
+                onCloseUpdate();
             }, 500)
         }
     }
@@ -65,7 +84,7 @@ const ModalAdd = ({ setIsAddAdmin }) => {
             return {
                 ...val,
                 img: URL.createObjectURL(file),
-                file:file,
+                file: file,
             }
         })
     }
@@ -97,20 +116,16 @@ const ModalAdd = ({ setIsAddAdmin }) => {
 
     return (
         <React.Fragment>
-            <div onClick={() => setIsAddAdmin(false)} className='absolute left-0 top-0 bg-black opacity-50 w-screen h-screen' />
+            <div onClick={() => onCloseUpdate()} className='absolute left-0 top-0 bg-black opacity-50 w-screen h-screen' />
             <div className='absolute left-[50%] top-[40%] translate-x-[-50%] translate-y-[-50%] pl-7 pr-7 pb-7 border shadow-lg flex-col bg-white rounded-md'>
                 <div className='h-[70px] flex justify-center items-center'>
-                    <h1 className='text-center  font-medium text-[18px]'>เพิ่ม Admin</h1>
+                    <h1 className='text-center  font-medium text-[18px]'>อัปเดต Admin</h1>
                 </div>
                 <div className='justify-center  items-start  flex py-5'>
                     <div className='flex flex-col items-center '>
                         <div className='flex items-center w-full mb-3'>
                             <p className='w-[80px]'>อีเมล์</p>
-                            <input name='email' value={newAdminData.email} onChange={onChangeTextUser} type='text' className='ml-4 bg-gray-100 outline-none py-1 flex-1 rounded-md pl-3' />
-                        </div>
-                        <div className='flex items-center w-full mb-3'>
-                            <p className='w-[80px]'>รหัสผ่าน</p>
-                            <input name='password' value={newAdminData.password} onChange={onChangeTextUser} type='text' className='ml-4 bg-gray-100 outline-none py-1 flex-1 rounded-md pl-3' />
+                            <input disabled name='email' value={newAdminData.email} onChange={onChangeTextUser} type='text' className='ml-4 bg-gray-100 outline-none py-1 flex-1 rounded-md pl-3' />
                         </div>
                         <div className='flex items-center w-full mb-3'>
                             <p className='w-[80px]'>ชื่อ นามสกุล</p>
@@ -150,4 +165,4 @@ const ModalAdd = ({ setIsAddAdmin }) => {
     )
 }
 
-export default ModalAdd
+export default ModalUpdadte

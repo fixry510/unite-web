@@ -4,28 +4,47 @@ import { LoadSelft } from '../../util/CustomLoad';
 import { onSnapshot, doc, collection } from "firebase/firestore";
 import { db } from '../../firebase';
 import ModalAdd from './ModalAdd';
+import ModalUpdadte from './ModalUpdate';
 
 const AddAdmin = () => {
     const [allAdmin, setAllAdmin] = useState([]);
     const [isAddAdmin, setIsAddAdmin] = useState(false);
+    const [isFirst, setIsFirst] = useState(true);
+
+    const [isUpdateAdmin, setIsUpdateAdmin] = useState(false);
+    const [updateAdminData, setUpdateAdminData] = useState(undefined);
 
     const [isLoad, setIsLoad] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onSnapshot(collection(db, "admin"), (doc) => {
-            setIsLoad(true);
+            if (isFirst) {
+                setIsLoad(true);
+            }
             const listAdmin = [];
             doc.docs.forEach(d => {
                 listAdmin.push(d.data());
             });
             setTimeout(() => {
                 setAllAdmin(listAdmin);
-                setIsLoad(false);
+                if (isFirst) {
+                    setIsLoad(false);
+                    setIsFirst(false);
+                }
             }, 500)
         });
         return () => unsubscribe()
     }, []);
 
+
+    const onUpdateAdmin = (admin) => {
+        setUpdateAdminData(admin);
+        setIsUpdateAdmin(true);
+    }
+    const onCloseUpdate = () => {
+        setUpdateAdminData(undefined);
+        setIsUpdateAdmin(false);
+    }
 
     const onAddAdmin = () => {
         setIsAddAdmin(true);
@@ -62,7 +81,7 @@ const AddAdmin = () => {
                         <tbody  >
                             {
                                 allAdmin.map((admin) => {
-                                    return <tr className="border-b hover:bg-gray-100 cursor-pointer" key={admin.uid}>
+                                    return <tr onClick={() => onUpdateAdmin(admin)} className="border-b hover:bg-gray-100 cursor-pointer" key={admin.uid}>
                                         <td className="text-center font-light px-6 py-4 text-sm  text-gray-900">
                                             {admin.email}
                                         </td>
@@ -77,7 +96,7 @@ const AddAdmin = () => {
                                                 {
                                                     (src, loading) => {
                                                         return loading ?
-                                                            <div className='min-w-[50px] min-h-[50px] w-[50px] h-[50px m-auto rounded-full bg-gray-100 flex justify-center items-center'>
+                                                            <div className='min-w-[50px] min-h-[50px] w-[50px] h-[50px] m-auto rounded-full bg-gray-100 flex justify-center items-center'>
                                                                 <LoadSelft />
                                                             </div>
                                                             : <img src={src} alt='' className='min-w-[50px] min-h-[50px] w-[50px] h-[50px] rounded-full bg-gray-100 m-auto  object-cover' />
@@ -93,7 +112,8 @@ const AddAdmin = () => {
                 </div>
             </div>
             {isAddAdmin && <ModalAdd setIsAddAdmin={setIsAddAdmin} />}
-            {isLoad && <div className='absolute w-full flex justify-center items-center  left-0 top-0 bottom-0  bg-black bg-opacity-30'>
+            {isUpdateAdmin && <ModalUpdadte onCloseUpdate={onCloseUpdate} adminData={updateAdminData} />}
+            {isLoad && isFirst && <div className='absolute w-full flex justify-center items-center  left-0 top-0 bottom-0  bg-black bg-opacity-30'>
                 <LoadSelft />
             </div>}
         </div>
